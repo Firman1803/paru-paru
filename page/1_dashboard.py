@@ -1,25 +1,13 @@
-
 import streamlit as st
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 
-st.title("📊 Dashboard - Exploratory Data Analysis")
-df = pd.read_csv("data/data.csv")
+st.title("📊 Dashboard")
+data = pd.read_csv("data/dataset.csv", header=None)
+data = data[0].str.split(";", expand=True)
+data.columns = ["Asal", "Biaya", "Minat", "Akses", "Kualitas", "Memilih"]
 
-st.subheader("Tampilan Data")
-st.dataframe(df)
+st.subheader("Preview Data")
+st.dataframe(data.head())
 
-st.subheader("Distribusi Target (Hasil)")
-st.bar_chart(df["Hasil"].value_counts())
-
-st.subheader("Usia vs Hasil")
-fig, ax = plt.subplots()
-sns.histplot(data=df, x="Usia", hue="Hasil", multiple="stack", ax=ax)
-st.pyplot(fig)
-
-st.subheader("Korelasi Fitur")
-corr = df.corr(numeric_only=True)
-fig, ax = plt.subplots()
-sns.heatmap(corr, annot=True, cmap="coolwarm", ax=ax)
-st.pyplot(fig)
+st.subheader("Distribusi Keputusan")
+st.bar_chart(data["Memilih"].value_counts())
