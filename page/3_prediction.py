@@ -1,52 +1,18 @@
 import streamlit as st
-import pandas as pd
+import numpy as np
 import joblib
 
-st.title("🩺 Prediksi Penyakit Paru-Paru")
+st.title("🔮 Prediksi Pemilihan Kampus")
 
-model = joblib.load("model.pkl")
+model = joblib.load("model/model.pkl")
 
-def predict(input_df):
-    input_encoded = pd.get_dummies(input_df)
-    input_encoded = input_encoded.reindex(columns=model.feature_names_in_, fill_value=0)
-    return model.predict(input_encoded)[0]
-
-# Input form
-usia = st.slider("Usia", 1, 100, 30)
-jk = st.selectbox("Jenis Kelamin", ["Laki-laki", "Perempuan"])
-merokok = st.selectbox("Merokok", ["Ya", "Tidak"])
-bekerja = st.selectbox("Bekerja", ["Ya", "Tidak"])
-rumahtangga = st.selectbox("Rumah Tangga", ["Ya", "Tidak"])
-begadang = st.selectbox("Begadang", ["Ya", "Tidak"])
-olahraga = st.selectbox("Olahraga", ["Ya", "Tidak"])
-asuransi = st.selectbox("Asuransi", ["Ya", "Tidak"])
-penyakit = st.selectbox("Penyakit Bawaan", ["Ya", "Tidak"])
-
-data = {
-    "Usia": [usia],
-    "Jenis Kelamin": [jk],
-    "Merokok": [merokok],
-    "Bekerja": [bekerja],
-    "Rumah Tangga": [rumahtangga],
-    "Begadang": [begadang],
-    "Olahraga": [olahraga],
-    "Asuransi": [asuransi],
-    "Penyakit Bawaan": [penyakit],
-}
-
-input_df = pd.DataFrame(data)
+asal = st.selectbox("Asal Wilayah", [1, 2, 3])
+biaya = st.number_input("Kemampuan Biaya (Rp)", value=3000000, step=500000)
+minat = st.selectbox("Minat Jurusan", [1, 2, 3])
+akses = st.selectbox("Kemudahan Akses", [1, 2, 3])
+kualitas = st.selectbox("Persepsi Kualitas", [1, 2, 3])
 
 if st.button("Prediksi"):
-    hasil = predict(input_df)
-    st.success(f"Hasil Prediksi: **{hasil}**")
-
-import os
-
-if st.button("Prediksi dan Simpan"):
-    hasil = predict(input_df)
-    input_df["Prediksi"] = hasil
-    if not os.path.exists("data/history.csv"):
-        input_df.to_csv("data/history.csv", index=False)
-    else:
-        input_df.to_csv("data/history.csv", mode="a", header=False, index=False)
-    st.success(f"Hasil Prediksi: **{hasil}** (juga disimpan ke riwayat)")
+    X = np.array([[asal, biaya, minat, akses, kualitas]])
+    hasil = model.predict(X)[0]
+    st.success(f"Prediksi: {'Memilih' if hasil == 'Ya' else 'Tidak Memilih'}")
